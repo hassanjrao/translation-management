@@ -33,7 +33,7 @@ class Translation extends Model
 
     public function tags(): BelongsToMany
     {
-        return $this->belongsToMany(Tag::class);
+        return $this->belongsToMany(Tag::class, 'translation_tag');
     }
 
     public function scopeByLocale(Builder $query, string $localeCode): Builder
@@ -60,4 +60,3 @@ class Translation extends Model
         return $query->whereHas('tags', static fn (Builder $builder) => $builder->whereIn('name', $tags));
     }
 }
-
