@@ -24,7 +24,7 @@ Route::prefix('v1')->group(function () {
         ->group(function () {
             Route::post('', [TranslationController::class, 'store']);
             Route::get('/{id}', [TranslationController::class, 'show']);
-            Route::put('/{id}', [TranslationController::class, 'update']);
+            Route::put('/{translation}', [TranslationController::class, 'update']);
             Route::get('/search', [TranslationController::class, 'search']);
             Route::get('/export', [TranslationController::class, 'export']);
             Route::delete('/{id}', [TranslationController::class, 'destroy']);

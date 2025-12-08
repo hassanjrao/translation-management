@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SearchTranslationRequest;
 use App\Http\Requests\StoreTranslationRequest;
 use App\Http\Requests\UpdateTranslationRequest;
+use App\Models\Translation;
 use App\Services\TranslationService;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
@@ -36,18 +37,13 @@ class TranslationController extends Controller
         }
     }
 
-    public function update(UpdateTranslationRequest $request, int $id): JsonResponse
+    public function update(UpdateTranslationRequest $request, Translation $translation): JsonResponse
     {
-        $existing = $this->translationService->findById($id);
-        if (!$existing) {
-            return $this->errorResponse('Translation not found', [], Response::HTTP_NOT_FOUND);
-        }
-
         try {
-            $dto = TranslationDTO::fromRequestForUpdate($request, $existing);
-            $translation = $this->translationService->update($id, $dto);
+            $dto = TranslationDTO::fromRequestForUpdate($request, $translation);
+            $updated = $this->translationService->update($translation->id, $dto);
 
-            return $this->successResponse($translation, 'Translation updated');
+            return $this->successResponse($updated, 'Translation updated');
         } catch (Throwable $exception) {
             return $this->errorResponse('Unable to update translation', ['exception' => $exception->getMessage()], Response::HTTP_BAD_REQUEST);
         }
@@ -91,4 +87,3 @@ class TranslationController extends Controller
         }
     }
 }
-
