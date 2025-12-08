@@ -19,8 +19,8 @@ class UpdateTranslationRequest extends FormRequest
     {
         $translationId = (int) $this->route('id');
         $localeId = $this->getLocaleId();
-
         $keyRule = Rule::unique('translations', 'key')->ignore($translationId);
+
         if ($localeId !== null) {
             $keyRule = $keyRule->where(static fn ($query) => $query->where('locale_id', $localeId));
         }
