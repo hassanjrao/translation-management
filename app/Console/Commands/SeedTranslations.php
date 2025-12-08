@@ -25,7 +25,7 @@ class SeedTranslations extends Command
         $this->info("Seeding {$count} translations in batches of {$batchSize}...");
         $this->seedLocalesAndTags();
 
-        $faker = fake();
+        $faker = \Faker\Factory::create();
         $locales = Locale::all();
         $tags = Tag::all()->pluck('id')->all();
 
@@ -39,9 +39,10 @@ class SeedTranslations extends Command
             $itemsThisBatch = min($batchSize, $count - $inserted);
 
             for ($i = 0; $i < $itemsThisBatch; $i++) {
+                $key = 'key_' . ($currentMaxId + $inserted + $i + 1) . '_' . $faker->lexify('??????');
                 $batch[] = [
                     'locale_id' => $locales->random()->id,
-                    'key' => 'key_' . ($inserted + $i) . '_' . $faker->unique()->word(),
+                    'key' => $key,
                     'value' => $faker->sentence(6),
                     'created_at' => $now,
                     'updated_at' => $now,
@@ -95,4 +96,3 @@ class SeedTranslations extends Command
         }
     }
 }
-
