@@ -13,6 +13,7 @@ use App\Repositories\Contracts\TranslationRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 
 class TranslationRepository implements TranslationRepositoryInterface
 {
@@ -98,27 +99,23 @@ class TranslationRepository implements TranslationRepositoryInterface
 
     public function exportByLocale(string $localeCode): Collection
     {
-        $cacheKey = "translations.export.{$localeCode}";
+        $versionKey = "translations:version:{$localeCode}";
+        $version = Cache::get($versionKey, 1);
+        $cacheKey = "translations:{$localeCode}:{$version}";
 
-        return Cache::tags(['translations', "locale:{$localeCode}"])
-            ->remember($cacheKey, self::CACHE_TTL_SECONDS, function () use ($localeCode): Collection {
-                return Translation::query()
-                    ->byLocale($localeCode)
-                    ->with([
-                        'tags:id,name',
-                        'locale:id,code',
-                    ])
-                    ->select(['id', 'key', 'value', 'locale_id'])
-                    ->orderBy('key')
-                    ->get()
-                    ->map(static fn (Translation $translation) => [
-                        'id' => $translation->id,
-                        'key' => $translation->key,
-                        'value' => $translation->value,
-                        'locale' => $translation->locale ? $translation->locale->code : null,
-                        'tags' => $translation->tags->pluck('name')->all(),
-                    ]);
-            });
+        $translations = Cache::tags(['translations', "locale:{$localeCode}"])
+        ->remember($cacheKey, self::CACHE_TTL_SECONDS, function () use ($localeCode) {
+            $translations = Translation::query()
+                ->byLocale($localeCode)
+                ->select(['key', 'value'])
+                ->cursor()
+                ->mapWithKeys(fn ($t) => [$t->key => $t->value])
+                ->all(); // store as plain array to avoid LazyCollection in cache
+
+            return $translations;
+        });
+
+        return collect($translations);
     }
 
     public function delete(int $id): bool

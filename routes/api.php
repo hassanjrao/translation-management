@@ -23,10 +23,10 @@ Route::prefix('v1')->group(function () {
         ->prefix('translations')
         ->group(function () {
             Route::post('', [TranslationController::class, 'store']);
-            Route::get('/{id}', [TranslationController::class, 'show']);
-            Route::put('/{translation}', [TranslationController::class, 'update']);
+            Route::get('/export/locale/{locale:code}', [TranslationController::class, 'export']);
             Route::get('/search', [TranslationController::class, 'search']);
-            Route::get('/export', [TranslationController::class, 'export']);
+            Route::put('/{translation}', [TranslationController::class, 'update']);
             Route::delete('/{id}', [TranslationController::class, 'destroy']);
+            Route::get('/{id}', [TranslationController::class, 'show']);
         });
 });

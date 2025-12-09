@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SearchTranslationRequest;
 use App\Http\Requests\StoreTranslationRequest;
 use App\Http\Requests\UpdateTranslationRequest;
+use App\Models\Locale;
 use App\Models\Translation;
 use App\Services\TranslationService;
 use App\Traits\ApiResponseTrait;
@@ -66,13 +67,9 @@ class TranslationController extends Controller
         return $this->successResponse($paginator, 'Translations fetched');
     }
 
-    public function export(Request $request): JsonResponse
+    public function export(Locale $locale): JsonResponse
     {
-        $request->validate([
-            'locale' => ['required', 'string', 'exists:locales,code'],
-        ]);
-
-        $data = $this->translationService->exportByLocale((string) $request->input('locale'));
+        $data = $this->translationService->exportByLocale($locale->code);
 
         return $this->successResponse($data, 'Translations exported');
     }
