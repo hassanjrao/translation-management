@@ -50,13 +50,8 @@ class TranslationController extends Controller
         }
     }
 
-    public function show(int $id): JsonResponse
+    public function show(Translation $translation): JsonResponse
     {
-        $translation = $this->translationService->findById($id);
-        if (!$translation) {
-            return $this->errorResponse('Translation not found', [], Response::HTTP_NOT_FOUND);
-        }
-
         return $this->successResponse($translation, 'Translation retrieved');
     }
 
@@ -74,10 +69,10 @@ class TranslationController extends Controller
         return $this->successResponse($data, 'Translations exported');
     }
 
-    public function destroy(int $id): JsonResponse
+    public function destroy(Translation $translation): JsonResponse
     {
         try {
-            $this->translationService->delete($id);
+            $this->translationService->delete($translation);
             return $this->successResponse(true, 'Translation deleted');
         } catch (Throwable $exception) {
             return $this->errorResponse('Unable to delete translation', ['exception' => $exception->getMessage()], Response::HTTP_BAD_REQUEST);

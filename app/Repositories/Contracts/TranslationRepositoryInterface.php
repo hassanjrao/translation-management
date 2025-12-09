@@ -22,5 +22,5 @@ interface TranslationRepositoryInterface
 
     public function exportByLocale(string $localeCode): Collection;
 
-    public function delete(int $id): bool;
+    public function delete(Translation $translation): bool;
 }

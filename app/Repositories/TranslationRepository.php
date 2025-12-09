@@ -118,9 +118,8 @@ class TranslationRepository implements TranslationRepositoryInterface
         return collect($translations);
     }
 
-    public function delete(int $id): bool
+    public function delete(Translation $translation): bool
     {
-        $translation = Translation::query()->findOrFail($id);
         $localeCode = $translation->locale ? $translation->locale->code : null;
         $deleted = (bool) $translation->delete();
 

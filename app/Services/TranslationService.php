@@ -34,11 +34,6 @@ class TranslationService
         });
     }
 
-    public function findById(int $id): ?Translation
-    {
-        return $this->translations->findById($id);
-    }
-
     public function search(TranslationFilterDTO $filter): LengthAwarePaginator
     {
         return $this->translations->search($filter);
@@ -49,12 +44,12 @@ class TranslationService
         return $this->translations->exportByLocale($localeCode);
     }
 
-    public function delete(int $id): bool
+    public function delete(Translation $translation): bool
     {
         try {
-            return DB::transaction(fn () => $this->translations->delete($id));
+            return DB::transaction(fn () => $this->translations->delete($translation));
         } catch (Throwable $exception) {
-            Log::error('Failed to delete translation', ['id' => $id, 'error' => $exception->getMessage()]);
+            Log::error('Failed to delete translation', ['id' => $translation->id, 'error' => $exception->getMessage()]);
             throw $exception;
         }
     }
