@@ -104,7 +104,7 @@ docker exec translation-management-app php artisan test --filter TranslationCont
 ## Design Approach
 - Controller → Service → Repository layering:
   - Controllers stay thin and handle HTTP concerns only.
-  - Services coordinate use cases (transactions, validation DTOs, logging) without DB details.
+  - Services hold business logic and coordinate use cases (transactions, validation DTOs, logging) without DB details.
   - Repositories own data access, caching, and query composition (e.g., cursor exports, search filters).
 - DTOs for request mapping: decouple HTTP payloads from domain/service inputs.
 - Resources for responses: stable client-facing shape; hides pivot/internal fields.
