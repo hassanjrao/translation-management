@@ -16,7 +16,6 @@ use App\Http\Resources\TranslationResource;
 use App\Services\TranslationService;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
@@ -43,7 +42,7 @@ class TranslationController extends Controller
     {
         try {
             $dto = TranslationDTO::fromRequestForUpdate($request, $translation);
-            $updated = $this->translationService->update($translation->id, $dto);
+            $updated = $this->translationService->update($translation, $dto);
 
             return $this->successResponse(new TranslationResource($updated), 'Translation updated');
         } catch (Throwable $exception) {

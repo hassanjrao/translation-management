@@ -91,3 +91,23 @@ docker exec translation-management-app php artisan test --filter TranslationCont
 - Caching: translations and search use Redis cache tags; cache invalidates on create/update/delete.
 - Export: `exportByLocale` streams via cursor to handle millions of records efficiently.
 - Throttling: API group uses `throttle:api`.***
+
+## Decisions & Rationale
+- Token-based auth via custom middleware (`api.token`): lightweight, no session, easy to rotate tokens.
+- TranslationResource for responses: consistent shape and hides internal pivots; keeps clients stable across changes.
+- Cursor-based export: handles millions of rows with low memory; pairs with cache versioning to ensure freshness.
+- Locale-scoped key uniqueness: enforced at validation level to avoid duplicate keys per locale.
+- Redis caching with tags: fine-grained invalidation on create/update/delete; avoids stale exports/search.
+- Tests focus on feature flows + validation: highest confidence in API contracts; repository logic covered where complex (caching/export/search).
+- Strict typing per file (`declare(strict_types=1)`): catches type issues early; PHP requires file-level opt-in.
+
+## Design Approach
+- Controller → Service → Repository layering:
+  - Controllers stay thin and handle HTTP concerns only.
+  - Services coordinate use cases (transactions, validation DTOs, logging) without DB details.
+  - Repositories own data access, caching, and query composition (e.g., cursor exports, search filters).
+- DTOs for request mapping: decouple HTTP payloads from domain/service inputs.
+- Resources for responses: stable client-facing shape; hides pivot/internal fields.
+- FormRequest validation: dedicated classes per endpoint for input validation and locale-scoped uniqueness rules.
+- Cache versioning on exports: ensures clients always receive latest translations without stale caches.
+- Route model binding: reduces boilerplate and ensures 404 handling automatically.

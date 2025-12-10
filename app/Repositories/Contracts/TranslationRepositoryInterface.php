@@ -14,7 +14,7 @@ interface TranslationRepositoryInterface
 {
     public function create(TranslationDTO $dto): Translation;
 
-    public function update(int $id, TranslationDTO $dto): Translation;
+    public function update(Translation $translation, TranslationDTO $dto): Translation;
 
     public function findById(int $id): ?Translation;
 

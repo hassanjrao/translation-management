@@ -34,12 +34,11 @@ class TranslationRepository implements TranslationRepositoryInterface
         return $translation->fresh();
     }
 
-    public function update(int $id, TranslationDTO $dto): Translation
+    public function update(Translation $translation, TranslationDTO $dto): Translation
     {
-        $translation = Translation::query()->findOrFail($id);
         $previousLocale = $translation->locale ? $translation->locale->code : null;
 
-        if ($dto->localeCode !== ($translation->locale ? $translation->locale->code : null)) {
+        if ($dto->localeCode !== $translation->locale?->code) {
             $translation->locale_id = $this->getLocaleId($dto->localeCode);
         }
 

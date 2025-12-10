@@ -27,10 +27,10 @@ class TranslationService
         });
     }
 
-    public function update(int $id, TranslationDTO $dto): Translation
+    public function update(Translation $translation, TranslationDTO $dto): Translation
     {
-        return DB::transaction(function () use ($id, $dto): Translation {
-            return $this->translations->update($id, $dto);
+        return DB::transaction(function () use ($translation, $dto): Translation {
+            return $this->translations->update($translation, $dto);
         });
     }
 
