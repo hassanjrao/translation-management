@@ -3,7 +3,7 @@
 API for managing locale-based translations with token auth, caching, and export support.
 
 ## Tech Stack
-- PHP 8.2+, Laravel
+- PHP 8.2+, Laravel 8.2
 - MySQL 8 (storage)
 - Redis 7 (cache/queue)
 - Docker & docker-compose (nginx, php-fpm, mysql, redis)
