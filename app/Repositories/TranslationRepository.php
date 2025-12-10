@@ -74,9 +74,9 @@ class TranslationRepository implements TranslationRepositoryInterface
                 $query = Translation::query()
                     ->with([
                         'locale:id,code,name',
-                        'tags:id,name',
+                        'tags:id,name,description',
                     ])
-                    ->select(['id', 'locale_id', 'key', 'value', 'updated_at']);
+                    ->select(['id', 'locale_id', 'key', 'value', 'created_at', 'updated_at']);
 
                 if ($filter->localeCode) {
                     $query->byLocale($filter->localeCode);

@@ -19,6 +19,7 @@ class SeedTranslations extends Command
 
     public function handle(): int
     {
+
         $count = (int) $this->option('count');
         $batchSize = (int) $this->option('batch');
 
@@ -30,7 +31,6 @@ class SeedTranslations extends Command
         $tags = Tag::all()->pluck('id')->all();
 
         $inserted = 0;
-        $currentMaxId = (int) (Translation::query()->max('id') ?? 0);
 
         while ($inserted < $count) {
             $batch = [];
@@ -39,7 +39,7 @@ class SeedTranslations extends Command
             $itemsThisBatch = min($batchSize, $count - $inserted);
 
             for ($i = 0; $i < $itemsThisBatch; $i++) {
-                $key = 'key_' . ($currentMaxId + $inserted + $i + 1) . '_' . $faker->lexify('??????');
+                $key = 'key_' . ($inserted + $i + 1) . '_' . $faker->lexify('??????');
                 $batch[] = [
                     'locale_id' => $locales->random()->id,
                     'key' => $key,
@@ -51,8 +51,9 @@ class SeedTranslations extends Command
 
             DB::table('translations')->insert($batch);
 
-            $firstId = $currentMaxId + 1;
-            $lastId = $currentMaxId + $itemsThisBatch;
+            // MySQL returns the first auto-increment ID for the bulk insert.
+            $firstId = (int) DB::getPdo()->lastInsertId();
+            $lastId = $firstId + $itemsThisBatch - 1;
             for ($translationId = $firstId; $translationId <= $lastId; $translationId++) {
                 $randomTags = collect($tags)->random(rand(1, 2))->all();
                 foreach ($randomTags as $tagId) {
@@ -67,7 +68,6 @@ class SeedTranslations extends Command
                 DB::table('translation_tag')->insert($pivotBatch);
             }
 
-            $currentMaxId = $lastId;
             $inserted += $itemsThisBatch;
             $this->info("Inserted {$inserted}/{$count} translations...");
         }

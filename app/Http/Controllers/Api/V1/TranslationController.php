@@ -12,6 +12,7 @@ use App\Http\Requests\StoreTranslationRequest;
 use App\Http\Requests\UpdateTranslationRequest;
 use App\Models\Locale;
 use App\Models\Translation;
+use App\Http\Resources\TranslationResource;
 use App\Services\TranslationService;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
@@ -32,7 +33,7 @@ class TranslationController extends Controller
         try {
             $translation = $this->translationService->create(TranslationDTO::fromRequest($request));
 
-            return $this->successResponse($translation, 'Translation created', Response::HTTP_CREATED);
+            return $this->successResponse(new TranslationResource($translation), 'Translation created', Response::HTTP_CREATED);
         } catch (Throwable $exception) {
             return $this->errorResponse('Unable to create translation', ['exception' => $exception->getMessage()], Response::HTTP_BAD_REQUEST);
         }
@@ -44,7 +45,7 @@ class TranslationController extends Controller
             $dto = TranslationDTO::fromRequestForUpdate($request, $translation);
             $updated = $this->translationService->update($translation->id, $dto);
 
-            return $this->successResponse($updated, 'Translation updated');
+            return $this->successResponse(new TranslationResource($updated), 'Translation updated');
         } catch (Throwable $exception) {
             return $this->errorResponse('Unable to update translation', ['exception' => $exception->getMessage()], Response::HTTP_BAD_REQUEST);
         }
@@ -52,14 +53,14 @@ class TranslationController extends Controller
 
     public function show(Translation $translation): JsonResponse
     {
-        return $this->successResponse($translation, 'Translation retrieved');
+        return $this->successResponse(new TranslationResource($translation), 'Translation retrieved');
     }
 
     public function search(SearchTranslationRequest $request): JsonResponse
     {
         $paginator = $this->translationService->search(TranslationFilterDTO::fromRequest($request));
 
-        return $this->successResponse($paginator, 'Translations fetched');
+        return $this->successResponse(TranslationResource::collection($paginator), 'Translations fetched');
     }
 
     public function export(Locale $locale): JsonResponse
